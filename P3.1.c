@@ -1,15 +1,13 @@
-/*Cuando se presione el pulsador Sx se encender· el correspondiente LEDx durante 250ms.
- *Se usar· el temporizador TA0
+/*Cuando se presione el pulsador Sx se encender√° el correspondiente LEDx durante 250ms.
+ *Se usar√° el temporizador TA0
  *
  *y el bloque 0 (TA0CCR0) en modo ascendente,
- *con la seÒal de reloj SMCLK por defecto ~1.1MHz y
+ *con la se√±al de reloj SMCLK por defecto ~1.1MHz y
  * el divisor /8.
  */
 
 #include <msp430g2533.h>
 
-#define PULS_ON 0
-#define PULS_OFF 1
 void config_perifericos();
 
 int main(void){
