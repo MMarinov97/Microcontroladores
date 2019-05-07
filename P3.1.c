@@ -37,7 +37,7 @@ int main(void){
                 P2OUT ^= BIT4;
 
                 /* Apagamos el temporizador */
-                TA0CTL &= ~MC_0;
+                TA0CTL |= MC_0;
 
                 S3=0;/* Actualizamos el valor del pulsador a pulsado */
             }
@@ -64,7 +64,7 @@ int main(void){
                 P2OUT ^= BIT5;
 
                 /* Apagamos el temporizador */
-                TA0CTL &= ~MC_0;
+                TA0CTL |= MC_0;
 
                 S4=0; /* Actualizamos el valor del pulsador a pulsado */
            }
@@ -92,7 +92,7 @@ int main(void){
                 P2OUT ^= BIT6;
 
                 /* Apagamos el temporizador */
-                TA0CTL &= ~MC_0;
+                TA0CTL |= MC_0;
 
                 S5=0; /* Actualizamos el valor a pulsado */
             }
@@ -119,7 +119,7 @@ int main(void){
 
                 /* Apagamos el temporizador */
 
-                TA0CTL &= ~MC_0;
+                TA0CTL |= MC_0;
 
                 S6=0;/* Actualizamos el valor a pulsado */
             }
