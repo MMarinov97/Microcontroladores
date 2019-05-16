@@ -7,6 +7,7 @@
  */
 
 #include <msp430g2533.h>
+#define NUM 34374
 /* Funcion que configura todo */
 void config_perifericos();
 /* Interrupcion para el puerto 1 */
@@ -17,7 +18,7 @@ __interrupt void PORT1_ISR(){
      * MC_1 -> Modo de operacion ascendente, cuenta de 0 a TACCR0
      * TACLR -> Resetea el timer a 0 */
     TA0CTL |= MC_1 + TACLR;
-    P1IFG = 0; /* Limpiamos el flag de interrupcion */
+    P1IFG &= ~BIT4; /* Limpiamos el flag de interrupcion */
 }
 /* Interrupcion para el puerto 2 */
 #pragma vector = PORT2_VECTOR;
@@ -29,17 +30,19 @@ __interrupt void PORT2_ISR(){
          * MC_1 -> Modo de operacion ascendente, cuenta de 0 a TACCR0
          * TACLR -> Resetea el timer a 0 */
         TA0CTL |= MC_1 + TACLR;
+		P2IFG &= ~BIT1; /* Limpiamos el flag de interrupcion */
         P2OUT |= BIT5;
         break;
     case BIT2:
         P2OUT |= BIT6;
+		P2IFG &= ~BIT2; /* Limpiamos el flag de interrupcion */
         TA0CTL |= MC_1 + TACLR;
         break;
     case BIT3:
         P2OUT |= BIT7;
+		P2IFG &= ~BIT3; /* Limpiamos el flag de interrupcion */
         TA0CTL |= MC_1 + TACLR;
     }
-    P2IFG = 0; /* Limpiamos el flag de interrupcion */
 }
 /* Interrupcion para el timer */
 
@@ -50,7 +53,7 @@ __interrupt void RTI_TA0CCR12(){
     if(cont == 4){
         /* Apagamos el temporizador */
         TA0CTL &= ~MC_1;
-        P2OUT &=~ (BIT4|BIT5|BIT6|BIT7);/* Apagamos los LEDs */
+        P2OUT &=~ (BIT4|BIT5|BIT6|BIT7); /* Apagamos los LEDs */
         cont = 0; /* Reseteamos el contador */
     }
 }
@@ -67,9 +70,11 @@ void config_perifericos(){
 
     /* Configuracion de los pulsadores */
     P1IE |= BIT4; /* Interrupt habilitado para el boton S3 */
+	P1IES |= BIT4; /* Detectamos flanco de bajada */
     P1IFG &=~ BIT4; /*  P1.4 IFG limpiado */
 
     P2IE |= (BIT1|BIT2|BIT3); /* Interrupt habilitado para los botones S4, S5 y S6 */
+	P2IES |= (BIT1|BIT2|BIT3); /* Detectamos flanco de bajada */
     P2IFG &=~ (BIT1|BIT2|BIT3); /* P2.1, P2.2 y P2.3 IFG limpiado */
 
     /* Boton S3 */
@@ -91,7 +96,7 @@ void config_perifericos(){
 
     /* Configuracion del timer */
     TA0CCTL0 = CCIE;
-    TACCR0=34374; /* Los ciclos que tiene que contar el timer */
+    TACCR0 = NUM; /* Los ciclos que tiene que contar el timer */
 
     /* TASSEL_2 -> Fuente del timer es SMCLK
      * ID_3 -> Divisor del timer /8 */

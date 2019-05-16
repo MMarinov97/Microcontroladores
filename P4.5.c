@@ -19,7 +19,7 @@ __interrupt void PORT1_ISR(){
     /* Habilitamos el timer
      * MC_2 -> Modo continuo, cuenta desde 0 hasta el valor maximo de TAR repetidamente (0xFFFF+1) */
     TACTL|=MC_2;
-    P1IFG = 0; /* Limpiamos el flag de interrupcion */
+    P1IFG &= ~BIT4; /* Limpiamos el flag de interrupcion */
 }
 /* Interrupcion para el puerto 2 */
 #pragma vector = PORT2_VECTOR;
@@ -28,23 +28,25 @@ __interrupt void PORT2_ISR(){
     switch(P2IFG){
     case BIT1:
         P2OUT |= BIT5;
+		P2IFG &= ~BIT1; /* Limpiamos el flag de interrupcion */
         /* Habilitamos el timer
          * MC_2 -> Modo continuo, cuenta desde 0 hasta el valor maximo de TAR repetidamente (0xFFFF+1) */
         TACTL|=MC_2;
         break;
     case BIT2:
         P2OUT |= BIT6;
+		P2IFG &= ~BIT2; /* Limpiamos el flag de interrupcion */
         /* Habilitamos el timer
          * MC_2 -> Modo continuo, cuenta desde 0 hasta el valor maximo de TAR repetidamente (0xFFFF+1) */
         TACTL|=MC_2;
         break;
     case BIT3:
         P2OUT |= BIT7;
+		P2IFG &= ~ BIT3; /* Limpiamos el flag de interrupcion */
         /* Habilitamos el timer
          * MC_2 -> Modo continuo, cuenta desde 0 hasta el valor maximo de TAR repetidamente (0xFFFF+1) */
         TACTL|=MC_2;
     }
-    P2IFG = 0; /* Limpiamos el flag de interrupcion */
 }
 /* Interrupcion para el timer */
 #pragma vector = TIMER0_A1_VECTOR
@@ -82,9 +84,11 @@ void config_perifericos(){
 
     /* Configuracion de los pulsadores */
     P1IE |= BIT4; /* Interrupt habilitado para el boton S3 */
+	P1IES |= BIT4; /* Detectamos flanco de bajada */
     P1IFG &=~ BIT4; /*  P1.4 IFG limpiado */
 
     P2IE |= (BIT1|BIT2|BIT3); /* Interrupt habilitado para los botones S4, S5 y S6 */
+	P2IES |= (BIT1|BIT2|BIT3); /* Detectamos flanco de bajada */
     P2IFG &=~ (BIT1|BIT2|BIT3); /* P2.1, P2.2 y P2.3 IFG limpiado */
 
     /* Boton S3 */
