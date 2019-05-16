@@ -25,28 +25,27 @@ __interrupt void PORT1_ISR(){
 #pragma vector = PORT2_VECTOR;
 __interrupt void PORT2_ISR(){
    /* Comprobamos que boton se ha pulsado y conmutamos el LED correspondiente */
-    switch(P2IFG){
-    case BIT1:
-        P2OUT |= BIT5;
+	if((P2IFG & BIT1) != 0){
+		P2OUT |= BIT5;
 		P2IFG &= ~BIT1; /* Limpiamos el flag de interrupcion */
         /* Habilitamos el timer
          * MC_2 -> Modo continuo, cuenta desde 0 hasta el valor maximo de TAR repetidamente (0xFFFF+1) */
         TACTL|=MC_2;
-        break;
-    case BIT2:
+	}
+	if((P2IFG & BIT2) != 0){
         P2OUT |= BIT6;
 		P2IFG &= ~BIT2; /* Limpiamos el flag de interrupcion */
         /* Habilitamos el timer
          * MC_2 -> Modo continuo, cuenta desde 0 hasta el valor maximo de TAR repetidamente (0xFFFF+1) */
-        TACTL|=MC_2;
-        break;
-    case BIT3:
+        TACTL|=MC_2;		
+	}
+	if((P2IFG & BIT3) != 0){
         P2OUT |= BIT7;
 		P2IFG &= ~ BIT3; /* Limpiamos el flag de interrupcion */
         /* Habilitamos el timer
          * MC_2 -> Modo continuo, cuenta desde 0 hasta el valor maximo de TAR repetidamente (0xFFFF+1) */
-        TACTL|=MC_2;
-    }
+        TACTL|=MC_2;		
+	}
 }
 /* Interrupcion para el timer */
 #pragma vector = TIMER0_A1_VECTOR
