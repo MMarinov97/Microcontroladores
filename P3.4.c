@@ -103,7 +103,7 @@ int main(void){
                 P2OUT ^= BIT6;
 
                 /* Apagamos el temporizador */
-                TA0CTL |= MC_0;
+                TA0CTL &= ~MC_2;
 
                 S5=0; /* Actualizamos el valor del pulsador a pulsado */
             }

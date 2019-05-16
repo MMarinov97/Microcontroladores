@@ -63,7 +63,7 @@ int main(void){
                 P2OUT ^= BIT5;
 
                 /* Apagamos el temporizador */
-                TA0CTL |= MC_0;
+                TA0CTL &= ~MC_2;
                 /* Actualizamos el valor de TACCR1 para la siguiente cuenta */
                 TACCR1 = TAR + NUM;
 
@@ -88,7 +88,7 @@ int main(void){
                 P2OUT ^= BIT6;
 
                 /* Apagamos el temporizador */
-                TA0CTL |= MC_0;
+                TA0CTL &= ~MC_2;
 
                 /* Actualizamos el valor de TACCR1 para la siguiente cuenta */
                 TACCR1 = TAR + NUM;
@@ -114,7 +114,7 @@ int main(void){
                  P2OUT ^= BIT7;
 
                  /* Apagamos el temporizador */
-                 TA0CTL |= MC_0;
+                 TA0CTL &= ~MC_2;
 
                  /* Actualizamos el valor de TACCR1 para la siguiente cuenta */
                  TACCR1 = TAR + NUM;
