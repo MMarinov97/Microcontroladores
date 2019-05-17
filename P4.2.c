@@ -12,35 +12,44 @@ void config_perifericos();
 /* Interrupcion para el puerto 1 */
 #pragma vector = PORT1_VECTOR;
 __interrupt void PORT1_ISR(){
-    P2OUT |= BIT4; /* Encendemos el LED */
-    /* Habilitamos el timer
-     * MC_1 -> Modo de operacion ascendente, cuenta de 0 a TACCR0
-     * TACLR -> Resetea el timer a 0 */
-    TA0CTL |= MC_1 + TACLR;
-	/* Limpiamos el flag de interrupcion */
-    P1IFG = 0;
-}
-/* Interrupcion para el puerto 2 */
-#pragma vector = PORT2_VECTOR;
-__interrupt void PORT2_ISR(){
-   /* Comprobamos que boton se ha pulsado y conmutamos el LED correspondiente */
-    switch(P2IFG){
-    case BIT1:
+    if((P1IFG & BIT4) != 0){
         /* Habilitamos el timer
          * MC_1 -> Modo de operacion ascendente, cuenta de 0 a TACCR0
          * TACLR -> Resetea el timer a 0 */
         TA0CTL |= MC_1 + TACLR;
-        P2OUT |= BIT5; /* Encendemos el LED */
-        break;
-    case BIT2:
-        P2OUT |= BIT6;
-        TA0CTL |= MC_1 + TACLR;
-        break;
-    case BIT3:
-        P2OUT |= BIT7;
-        TA0CTL |= MC_1 + TACLR;
+        P2OUT |= BIT4; /* Conmutamos el LED */
+        P1IFG &= ~BIT4; /* Limpiamos el flag de interrupcion */
     }
-    P2IFG = 0; /* Limpiamos el flag de interrupcion */
+}
+/* Interrupcion para el puerto 2 */
+#pragma vector = PORT2_VECTOR;
+__interrupt void PORT2_ISR(){
+    /* Comprobamos que boton se ha pulsado y conmutara el LED correspondiente */
+     if((P2IFG & BIT1) != 0){
+         /* Habilitamos el timer
+          * MC_1 -> Modo de operacion ascendente, cuenta de 0 a TACCR0
+          * TACLR -> Resetea el timer a 0 */
+         TA0CTL |= MC_1 + TACLR;
+         P2OUT |= BIT5; /* Conmutamos el LED */
+         P2IFG &= ~BIT1; /* Limpiamos el flag de interrupcion */
+     }
+
+     if((P2IFG & BIT2) != 0){
+         /* Habilitamos el timer
+          * MC_1 -> Modo de operacion ascendente, cuenta de 0 a TACCR0
+          * TACLR -> Resetea el timer a 0 */
+         TA0CTL |= MC_1 + TACLR;
+         P2OUT |= BIT6; /* Conmutamos el LED */
+         P2IFG &= ~BIT2; /* Limpiamos el flag de interrupcion */
+     }
+     if((P2IFG & BIT3) != 0){
+         /* Habilitamos el timer
+          * MC_1 -> Modo de operacion ascendente, cuenta de 0 a TACCR0
+          * TACLR -> Resetea el timer a 0 */
+         TA0CTL |= MC_1 + TACLR;
+         P2OUT |= BIT7; /* Conmutamos el LED */
+         P2IFG &= ~BIT3; /* Limpiamos el flag de interrupcion */
+     }
 }
 /* Interrupcion para el timer */
 #pragma vector = TIMER0_A0_VECTOR
@@ -58,14 +67,9 @@ int main(void){
 /* FIN DE MAIN */
 
 void config_perifericos(){
-    WDTCTL =WDTPW + WDTHOLD; /* Parar el timer del watchdog */
+    WDTCTL = WDTPW + WDTHOLD; /* Parar el timer del watchdog */
 
     /* Configuracion de los pulsadores */
-    P1IE |= BIT4; /* Interrupt habilitado para el boton S3 */
-    P1IFG &=~ BIT4; /*  P1.4 IFG limpiado */
-
-    P2IE |= (BIT1|BIT2|BIT3); /* Interrupt habilitado para los botones S4, S5 y S6 */
-    P2IFG &=~ (BIT1|BIT2|BIT3); /* P2.1, P2.2 y P2.3 IFG limpiado */
 
     /* Boton S3 */
     P1DIR &=~BIT4;/* Lo habilitamos como entrada */
@@ -76,6 +80,14 @@ void config_perifericos(){
     P2DIR &=~(BIT1|BIT2|BIT3);
     P2REN |= (BIT1|BIT2|BIT3);
     P2OUT |= (BIT1|BIT2|BIT3);
+    /* Interrupciones Botones */
+    P1IFG &=~ BIT4; /*  P1.4 IFG limpiado */
+    P1IE |= BIT4; /* Interrupt habilitado para el boton S3 */
+    P1IES |= BIT4; /* Detectamos flanco de bajada */
+
+    P2IFG &=~ (BIT1|BIT2|BIT3); /* P2.1, P2.2 y P2.3 IFG limpiado */
+    P2IE |= (BIT1|BIT2|BIT3); /* Interrupt habilitado para los botones S4, S5 y S6 */
+    P2IES |= (BIT1|BIT2|BIT3); /* Detectamos flanco de bajada */
     /* Configuracion de los LEDs */
 
     P2SEL &=~ (BIT6|BIT7);
