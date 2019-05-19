@@ -75,6 +75,7 @@ __interrupt void PORT1_ISR(){
             P1IES |= BIT4; /* Configuramos para el flanco de subida */
         }
     }
+	__low_power_mode_off_on_exit();
 }
 
 /*
@@ -140,6 +141,7 @@ __interrupt void PORT2_ISR(){
             P2IES |= BIT3; /* Configuramos para el flanco de bajada */
         }
     }
+	__low_power_mode_off_on_exit();
 }
 
 /*
@@ -151,7 +153,7 @@ __interrupt void PORT2_ISR(){
 */
 int main(){
     config_perifericos();
-    while(1);
+    __low_power_mode_0();
 }
 /*
    ____ ___  _   _ _____ ___ ____
@@ -163,6 +165,9 @@ int main(){
 void config_perifericos(){
     /* Configuracion del Watchdog */
     WDTCTL = WDTPW  + WDTHOLD; /* Paramos el Watchdog */
+    DCOCTL = 0;             // Frecuencia DCO (1MHz)
+    BCSCTL1 = CALBC1_1MHZ;
+    DCOCTL = CALDCO_1MHZ;
     IE1 |= WDTIE; /* Habilitamos la interrupcion para el Watchdog */
 
     /* Configuracion de los pulsadores */
