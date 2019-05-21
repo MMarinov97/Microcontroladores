@@ -8,6 +8,11 @@
 #define EVENTO_S4 BIT1
 #define EVENTO_S5 BIT2
 #define EVENTO_S6 BIT3
+
+#define SET(ev) (eventos |= (ev))
+#define RESET(ev) (eventos &= ~(ev))
+#define TEST(ev) (eventos & (ev))
+
 unsigned char estado_actual = ESTADO_A;
 unsigned char eventos;
 /* Funcion de configuracion de los perifericos */
@@ -69,7 +74,7 @@ __interrupt void PORT1_ISR(){
 
         /* COMPROBACION DE FLANCO */
         if((P1IES & BIT4) == BIT4){ /* Flanco de BAJADA */
-            eventos |= EVENTO_S3;
+            SET(EVENTO_S3);
             P1IES &= ~BIT4; /* Configuramos para flanco de subida */
         } else { /* Flanco de SUBIDA */
             P1IES |= BIT4; /* Configuramos para el flanco de bajada */
@@ -101,7 +106,7 @@ __interrupt void PORT2_ISR(){
         if((P2IES & BIT1) == BIT1){ /* Flanco de BAJADA */
             P2IES &= ~BIT1; /* Configuramos para flanco de subida */
         } else { /* Flanco de SUBIDA */
-            eventos |= EVENTO_S4;
+            SET(EVENTO_S4);
             P2IES |= BIT1; /* Configuramos para el flanco de bajada */
         }
     }
@@ -117,7 +122,7 @@ __interrupt void PORT2_ISR(){
 
         /* COMPROBACION DE FLANCO */
         if((P2IES & BIT2) == BIT2){ /* Flanco de BAJADA */
-            eventos= EVENTO_S5;
+            SET(EVENTO_S5);
             P2IES &= ~BIT2; /* Configuramos para flanco de subida */
         } else { /* Flanco de SUBIDA */
             P2IES |= BIT2; /* Configuramos para el flanco de bajada */
@@ -137,7 +142,7 @@ __interrupt void PORT2_ISR(){
         if((P2IES & BIT3) == BIT3){ /* Flanco de BAJADA */
             P2IES &= ~BIT3; /* Configuramos para flanco de subida */
         } else { /* Flanco de SUBIDA */
-            eventos |= EVENTO_S6;
+            SET(EVENTO_S6);
             P2IES |= BIT3; /* Configuramos para el flanco de bajada */
         }
     }
@@ -154,21 +159,21 @@ __interrupt void PORT2_ISR(){
 int main(){
     config_perifericos();
     while(1){
-        if(eventos & EVENTO_S3){
+        if(TEST(EVENTO_S3)){
             manejar_estados(EVENTO_S3);
-            eventos &=~ EVENTO_S3;
+            RESET(EVENTO_S3);
         }
-        if(eventos & EVENTO_S4){
+        if(TEST(EVENTO_S4)){
             manejar_estados(EVENTO_S4);
-            eventos &=~ EVENTO_S4;
+            RESET(EVENTO_S4);
         }
-        if(eventos & EVENTO_S5){
+        if(TEST(EVENTO_S5)){
             manejar_estados(EVENTO_S5);
-            eventos &=~ EVENTO_S5;
+            RESET(EVENTO_S5);
         }
-        if(eventos & EVENTO_S6){
+        if(TEST(EVENTO_S6)){
             manejar_estados(EVENTO_S6);
-            eventos &=~ EVENTO_S5;
+            RESET(EVENTO_S6);
         }
         __low_power_mode_0();
     }
@@ -205,7 +210,7 @@ void config_perifericos(){
 
     P2IFG &= ~(BIT1|BIT2|BIT3); /* Flags de interrupcion limpiados */
     P2IE |= (BIT1|BIT2|BIT3); /* Interrupt habilitado para S4, S5 y S6 */
-    P1IES |= (BIT1|BIT2|BIT3); /* Detectamos flanco de SUBIDA para S4 y S6 */
+    P1IES |= (BIT1|BIT2|BIT3); /* Detectamos flanco de BAJADA para S4, S5 y S6 */
   //  P1IES |= BIT2; /* Detectamos flanco de BAJADA para S5 */
 
     /*Configuracion de los LEDs */
